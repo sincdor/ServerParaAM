@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ServidorParaAM:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ServidorParaAM_jar</output-path>
+    <root id="archive" name="ServidorParaAM.jar">
+      <element id="module-output" name="ServidorParaAM" />
+    </root>
+  </artifact>
+</component>
