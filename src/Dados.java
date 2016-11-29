@@ -32,4 +32,15 @@ public class Dados{
     }
 
 
+    //Caso existe algum user com o
+    public boolean existUser(String nome)
+    {
+        for(NewUser u : allUsers){
+            if(u.getUserName().equals(nome))
+                return true;
+        }
+        return false;
+    }
+
+
 }

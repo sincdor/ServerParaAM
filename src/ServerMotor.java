@@ -18,7 +18,11 @@ public class ServerMotor {
 
         while(true)
         {
+            System.out.println("[SM - INFO] - Waiting for Clients...");
             Socket connectionSocket = welcomeSocket.accept();
+            connectionSocket.setSoTimeout(500000);
+            System.out.println("[SM - INFO] - Client found... ip: " + connectionSocket.getInetAddress().toString());
+            System.out.println("[SM - INFO] - Starting thread...");
             Runnable runnable = new ClienteHandler(connectionSocket, dados);
             Thread thread = new Thread(runnable);
             thread.start();

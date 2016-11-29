@@ -1,10 +1,9 @@
 /**
  * Created by andre on 20-10-2016.
  */
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import TiposDeMensagens.MSGClienteCliente;
+
+import java.io.*;
 import java.net.*;
 import java.util.*;
 
@@ -34,6 +33,28 @@ public class ClienteHandler implements Runnable
         this.dados = dados;
     }
 
+    public String getAllUsersOn(){
+        String aux = null;
+        for(NewUser u : ServerMotor.dados.allUsers)
+        {
+            aux += ":" + u.getUserName();
+        }
+        return aux;
+    }
+
+    public void writeToAllUser(String mensagem){
+        for (NewUser a : ServerMotor.dados.allUsers) {
+            try {
+                PrintWriter writeToCliente = new PrintWriter(a.userSocket.getOutputStream());
+                writeToCliente.println(mensagem);
+                writeToCliente.flush();
+            }catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void run() {
         String clienteSentence = null;
         PrintWriter writeToCliente = null;
@@ -41,6 +62,7 @@ public class ClienteHandler implements Runnable
         BufferedReader inFromClient = null;
         String[] args = null;
         String[] getMessage;
+        MSGClienteCliente msgClienteCliente;
 
         try {
             inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -59,12 +81,19 @@ public class ClienteHandler implements Runnable
             System.out.println("Received: " + clienteSentence + " ---from ip:" + socket.getInetAddress() + ":   port: " + socket.getPort());
 
             System.out.println("User: " + args[0] + " Password: " + args[1]);
+            /*
+            if(ServerMotor.dados.existUser(args[0])){
+                writeToCliente.println("[ERRO] Already logged");
+                writeToCliente.flush();
+            }
+            */
             clienteSentence = null;
-            clienteSentence = "AllUsers";
+            clienteSentence = "AllUsers" + getAllUsersOn();
+            /*
             for(NewUser u : ServerMotor.dados.allUsers)
             {
                 clienteSentence += ":" + u.getUserName();
-            }
+            }*/
             writeToCliente.println(clienteSentence);
             writeToCliente.flush();
         }catch (IOException e)
@@ -76,26 +105,15 @@ public class ClienteHandler implements Runnable
         //Falta verificar o id e a password
 
         assert args != null;
+
         ServerMotor.dados.allUsers.add(new NewUser(args[0], args[1], socket.getInetAddress().toString(), socket.getPort(), socket));
         thisUserName = args[0];
         thisIp = socket.getInetAddress().toString();
         thisPort = socket.getPort();
 
 
-        for (NewUser a : ServerMotor.dados.allUsers) {
-            try {
-                writeToCliente = new PrintWriter(a.userSocket.getOutputStream());
-                writeToCliente.println("NewUser:" + thisUserName);
-                writeToCliente.flush();
-            }catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-
-        //dados.allUsers.add(new NewUser(args[0], args[1], socket.getInetAddress().toString(), socket.getPort()));
-
+        //Informa Todos os Utilizadores que um novo cliente entrou.
+        writeToAllUser("NewUser:" + thisUserName);
 
         do{
             try {
